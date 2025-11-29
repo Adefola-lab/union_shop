@@ -59,9 +59,12 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     color: const Color(0xFF4d2963),
                     child: const Text(
-                      'PLACEHOLDER HEADER TEXT',
+                      'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                   // Main header
@@ -193,19 +196,21 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          'Placeholder Hero Title',
+                          'Essential Range - Over 20% Off!',
                           style: TextStyle(
-                            fontSize: 32,
+                            fontSize: 65,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             height: 1.2,
+                            letterSpacing: 1.5,
                           ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          "This is placeholder text for the hero section.",
+                          "Over 20% off our essential range. Come and grab yours while stock lasts!",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20
+                            ,fontWeight: FontWeight.bold,
                             color: Colors.white,
                             height: 1.5,
                           ),
