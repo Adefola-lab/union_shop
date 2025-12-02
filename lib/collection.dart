@@ -196,12 +196,103 @@ class CollectionPage extends StatelessWidget {
               ),
             ),
 
-            // Blank content area
+            // Content area with grid
             Container(
               color: Colors.white,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 80, horizontal: 300),
-              child: const SizedBox(height: 400),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 40, horizontal: 300),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Collections',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 16),
+                        GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount:
+                              MediaQuery.of(context).size.width > 600 ? 3 : 1,
+                          mainAxisSpacing: 40,
+                          crossAxisSpacing: 40,
+                          children: const [
+                            ImageCard(
+                              title: 'Black Friday',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2057591057/display_1500/stock-photo-black-friday-sale-or-discount-banner-red-clothes-tag-over-black-background-modern-minimal-design-2057591057.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Clothing',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2546478191/display_1500/stock-photo-women-s-sweaters-with-long-sleeves-isolated-on-white-background-2546478191.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Essential Range',
+                              imageUrl:
+                                  'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=60',
+                            ),
+                            ImageCard(
+                              title: 'Graduation',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2236038943/display_1500/stock-photo-graduates-wear-a-black-dress-black-hat-at-the-university-level-2236038943.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Limited Edition Merch',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2540391243/display_1500/stock-vector-modern-simple-minimal-typographic-design-of-a-saying-limited-edition-in-tones-of-grey-red-color-2540391243.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Personalisation',
+                              imageUrl:
+                                  'https://images.unsplash.com/photo-1581089781785-603411fa81e5?auto=format&fit=crop&w=1200&q=60',
+                            ),
+                            ImageCard(
+                              title: 'SALE',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2057591057/display_1500/stock-photo-black-friday-sale-or-discount-banner-red-clothes-tag-over-black-background-modern-minimal-design-2057591057.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Merchandise',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2604856497/display_1500/stock-photo-different-blank-items-for-branding-on-beige-background-flat-lay-mockup-for-design-2604856497.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Winter',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2223881507/display_1500/stock-photo-full-length-of-cheerful-woman-in-faux-fur-jacket-and-stylish-eyeglasses-walking-on-blue-2223881507.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Spring',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2027170712/display_1500/stock-photo-profile-side-photo-of-young-handsome-man-happy-positive-smile-curious-dreamy-walk-park-nature-2027170712.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Summer',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2260331207/display_1500/stock-photo-funny-cheerful-man-wearing-life-buoy-waist-having-fun-and-fooling-around-on-light-green-background-2260331207.jpg',
+                            ),
+                            ImageCard(
+                              title: 'Autumn',
+                              imageUrl:
+                                  'https://www.shutterstock.com/shutterstock/photos/2382171027/display_1500/stock-photo-fashion-autumnal-outfit-knitted-brown-sweater-with-hat-pants-and-handbag-women-s-warm-jumper-2382171027.jpg',
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
             ),
 
             // Footer (same as main)
@@ -461,6 +552,64 @@ class CollectionPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ImageCard extends StatelessWidget {
+  final String title;
+  final String imageUrl;
+
+  const ImageCard({
+    super.key,
+    required this.title,
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // No action for now
+      },
+      child: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: Icon(Icons.image_not_supported, color: Colors.grey),
+                  ),
+                );
+              },
+            ),
+          ),
+          // Dark overlay
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.4),
+            ),
+          ),
+          // Centered text
+          Center(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }

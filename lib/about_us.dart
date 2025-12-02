@@ -22,6 +22,7 @@ class AboutUsPage extends StatelessWidget {
               color: Colors.white,
               child: Column(
                 children: [
+                  // Top banner
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -36,6 +37,7 @@ class AboutUsPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // Main header
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -61,7 +63,7 @@ class AboutUsPage extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          // Center nav
+                          // Center nav (matches main)
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -76,20 +78,72 @@ class AboutUsPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('Shop',
-                                        style: TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 14)),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down,
-                                        size: 16, color: Colors.black87),
-                                  ],
+                              // REPLACE THIS "Shop" TextButton WITH THE DROPDOWN
+                              PopupMenuButton<String>(
+                                offset: const Offset(0, 40),
+                                onSelected: (value) {
+                                  placeholderCallbackForButtons();
+                                },
+                                child: const TextButton(
+                                  onPressed: null, // handled by PopupMenuButton
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('Shop',
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontSize: 14)),
+                                      SizedBox(width: 4),
+                                      Icon(Icons.keyboard_arrow_down,
+                                          size: 16, color: Colors.black87),
+                                    ],
+                                  ),
                                 ),
+                                itemBuilder: (context) => const [
+                                  PopupMenuItem<String>(
+                                    value: 'clothing',
+                                    child: Text('Clothing'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'merchandise',
+                                    child: Text('Merchandise'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'halloween',
+                                    child: Row(
+                                      children: [
+                                        Text('Halloween '),
+                                        Text('🎃'),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'signature',
+                                    child: Text('Signature & Essential Range'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'portsmouth',
+                                    child: Text('Portsmouth City Collection'),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'pride',
+                                    child: Row(
+                                      children: [
+                                        Text('Pride Collection '),
+                                        Text('🏳️‍🌈'),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuItem<String>(
+                                    value: 'graduation',
+                                    child: Row(
+                                      children: [
+                                        Text('Graduation '),
+                                        Text('🎓'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(width: 8),
                               TextButton(
@@ -115,7 +169,7 @@ class AboutUsPage extends StatelessWidget {
                                         color: Colors.black87, fontSize: 14)),
                               ),
                               const SizedBox(width: 8),
-                              // Current page indicator (underline)
+                              // Active page indicator
                               TextButton(
                                 onPressed: () {},
                                 child: const Text(
@@ -137,6 +191,7 @@ class AboutUsPage extends StatelessWidget {
                             ],
                           ),
                           const Spacer(),
+                          // Right-side icons
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -228,9 +283,7 @@ class AboutUsPage extends StatelessWidget {
                                 decoration: TextDecoration.underline,
                                 color: Colors.black87,
                               ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                },
+                              recognizer: TapGestureRecognizer()..onTap = () {},
                             ),
                             const TextSpan(text: '!'),
                           ],
@@ -260,10 +313,7 @@ class AboutUsPage extends StatelessWidget {
                                 decoration: TextDecoration.underline,
                                 color: Colors.black87,
                               ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-
-                                },
+                              recognizer: TapGestureRecognizer()..onTap = () {},
                             ),
                             const TextSpan(text: '.'),
                           ],
