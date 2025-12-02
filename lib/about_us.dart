@@ -230,7 +230,6 @@ class AboutUsPage extends StatelessWidget {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  // TODO: link to personalisation page
                                 },
                             ),
                             const TextSpan(text: '!'),
@@ -263,7 +262,7 @@ class AboutUsPage extends StatelessWidget {
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  // TODO: handle email tap (mailto)
+
                                 },
                             ),
                             const TextSpan(text: '.'),
