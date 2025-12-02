@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/product_page.dart';
-import 'package:union_shop/about_us.dart'; 
+import 'package:union_shop/about_us.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -24,7 +24,7 @@ class UnionShopApp extends StatelessWidget {
       // In your browser, try this link: http://localhost:49856/#/product
       routes: {
         '/product': (context) => const ProductPage(),
-        '/about': (context) => const AboutUsPage(), 
+        '/about': (context) => const AboutUsPage(),
       },
     );
   }
@@ -116,23 +116,75 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Shop',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: 14,
+                              PopupMenuButton<String>(
+                                offset: const Offset(0, 40),
+                                child: const TextButton(
+                                  onPressed: null,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Shop',
+                                        style: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down,
-                                        size: 16, color: Colors.black87),
-                                  ],
+                                      SizedBox(width: 4),
+                                      Icon(Icons.keyboard_arrow_down,
+                                          size: 16, color: Colors.black87),
+                                    ],
+                                  ),
                                 ),
+                                itemBuilder: (BuildContext context) => [
+                                  const PopupMenuItem<String>(
+                                    value: 'clothing',
+                                    child: Text('Clothing'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'merchandise',
+                                    child: Text('Merchandise'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'halloween',
+                                    child: Row(
+                                      children: [
+                                        Text('Halloween '),
+                                        Text('🎃'),
+                                      ],
+                                    ),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'signature',
+                                    child: Text('Signature & Essential Range'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'portsmouth',
+                                    child: Text('Portsmouth City Collection'),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'pride',
+                                    child: Row(
+                                      children: [
+                                        Text('Pride Collection '),
+                                        Text('🏳️‍🌈'),
+                                      ],
+                                    ),
+                                  ),
+                                  const PopupMenuItem<String>(
+                                    value: 'graduation',
+                                    child: Row(
+                                      children: [
+                                        Text('Graduation '),
+                                        Text('🎓'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                onSelected: (String value) {
+                                  // Handle menu item selection
+                                  placeholderCallbackForButtons();
+                                },
                               ),
                               const SizedBox(width: 8),
                               TextButton(
