@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:union_shop/product_page.dart';
+import 'package:union_shop/about_us.dart'; 
 
 void main() {
   runApp(const UnionShopApp());
@@ -21,7 +22,10 @@ class UnionShopApp extends StatelessWidget {
       initialRoute: '/',
       // When navigating to '/product', build and return the ProductPage
       // In your browser, try this link: http://localhost:49856/#/product
-      routes: {'/product': (context) => const ProductPage()},
+      routes: {
+        '/product': (context) => const ProductPage(),
+        '/about': (context) => const AboutUsPage(), 
+      },
     );
   }
 }
@@ -95,7 +99,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          
+
                           // Navigation Menu
                           Row(
                             mainAxisSize: MainAxisSize.min,
@@ -125,7 +129,8 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ),
                                     SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black87),
+                                    Icon(Icons.keyboard_arrow_down,
+                                        size: 16, color: Colors.black87),
                                   ],
                                 ),
                               ),
@@ -143,7 +148,8 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ),
                                     SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black87),
+                                    Icon(Icons.keyboard_arrow_down,
+                                        size: 16, color: Colors.black87),
                                   ],
                                 ),
                               ),
@@ -160,7 +166,8 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               TextButton(
-                                onPressed: placeholderCallbackForButtons,
+                                onPressed: () => Navigator.pushNamed(
+                                    context, '/about'), // UPDATED
                                 child: const Text(
                                   'About',
                                   style: TextStyle(
@@ -182,7 +189,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          
+
                           const Spacer(),
                           ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 600),
@@ -331,7 +338,8 @@ class HomeScreen extends StatelessWidget {
             Container(
               color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 300),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 40, horizontal: 300),
                 child: Column(
                   children: [
                     const Text(
