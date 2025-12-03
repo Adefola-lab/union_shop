@@ -311,9 +311,11 @@ class ProductPage extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
+                                  Icon(Icons.image_not_supported,
+                                      size: 64, color: Colors.grey),
                                   SizedBox(height: 8),
-                                  Text('Image unavailable', style: TextStyle(color: Colors.grey)),
+                                  Text('Image unavailable',
+                                      style: TextStyle(color: Colors.grey)),
                                 ],
                               ),
                             ),
