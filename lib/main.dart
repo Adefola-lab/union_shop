@@ -21,9 +21,21 @@ class UnionShopApp extends StatelessWidget {
       home: const HomeScreen(),
       initialRoute: '/',
       routes: {
-        '/product': (context) => const ProductPage(),
         '/about': (context) => const AboutUsPage(),
-        '/collection': (context) => const CollectionPage(), // ADD THIS
+        '/collection': (context) => const CollectionPage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/product') {
+          final args = settings.arguments as Map<String, String>;
+          return MaterialPageRoute(
+            builder: (context) => ProductPage(
+              title: args['title']!,
+              price: args['price']!,
+              imageUrl: args['imageUrl']!
+            ),
+          );
+        }
+        return null;
       },
     );
   }
@@ -431,12 +443,16 @@ class HomeScreen extends StatelessWidget {
                               price: '£20.00',
                               imageUrl:
                                   'https://www.shutterstock.com/shutterstock/photos/2409871423/display_1500/stock-photo-a-mock-up-template-of-a-white-hoodie-worn-by-a-man-a-design-concept-for-print-and-branding-a-2409871423.jpg',
+                              description:
+                                  'Premium quality essential hoodie from our limited edition collection. Made with soft, comfortable fabric perfect for everyday wear. Available in multiple colors and sizes.',
                             ),
                             ProductCard(
                               title: 'Essential T-Shirt',
                               price: '£10.00',
                               imageUrl:
                                   'https://www.shutterstock.com/shutterstock/photos/2521327419/display_1500/stock-photo-man-wearing-an-oversize-t-shirt-2521327419.jpg',
+                              description:
+                                  'Classic essential t-shirt designed for comfort and style. Made from high-quality cotton blend material. Perfect for casual wear or layering.',
                             ),
                           ],
                         ),
@@ -470,12 +486,16 @@ class HomeScreen extends StatelessWidget {
                               price: '£32.99',
                               imageUrl:
                                   'https://www.shutterstock.com/shutterstock/photos/2603337191/display_1500/stock-photo-person-in-a-cream-hoodie-stands-against-a-stone-building-casual-hoodie-style-urban-setting-2603337191.jpg',
+                              description:
+                                  'Our premium signature hoodie featuring the iconic Portsmouth University design. Crafted with superior materials for maximum comfort and durability. A must-have for any student wardrobe.',
                             ),
                             ProductCard(
                               title: 'Signature T-Shirt',
                               price: '£14.99',
                               imageUrl:
                                   'https://www.shutterstock.com/shutterstock/photos/2470399579/display_1500/stock-photo-male-and-female-fashionable-t-shirt-motivational-quote-t-shirt-for-gym-2470399579.jpg',
+                              description:
+                                  'Show your Portsmouth pride with our signature t-shirt. Features distinctive university branding and motivational design. Made from breathable, comfortable fabric suitable for all-day wear.',
                             ),
                           ],
                         ),
@@ -509,24 +529,32 @@ class HomeScreen extends StatelessWidget {
                               price: '£10.00',
                               imageUrl:
                                   'https://shop.upsu.net/cdn/shop/files/PortsmouthCityPostcard2_1024x1024@2x.jpg?v=1752232561',
+                              description:
+                                  'Beautiful postcard featuring iconic Portsmouth city landmarks. Perfect for sending to friends and family or keeping as a souvenir of your time in Portsmouth.',
                             ),
                             ProductCard(
                               title: 'Portsmouth City Magnet',
                               price: '£15.00',
                               imageUrl:
                                   'https://shop.upsu.net/cdn/shop/files/PortsmouthCityMagnet1_1024x1024@2x.jpg?v=1752230282',
+                              description:
+                                  'Decorative fridge magnet showcasing Portsmouth\'s most beloved landmarks. A perfect keepsake or gift to remember your university experience.',
                             ),
                             ProductCard(
                               title: 'Portsmouth City Bookmark',
                               price: '£20.00',
                               imageUrl:
                                   'https://shop.upsu.net/cdn/shop/files/PortsmouthCityBookmark1_1024x1024@2x.jpg?v=1752230004',
+                              description:
+                                  'Premium quality bookmark featuring Portsmouth city illustrations. Ideal for students and book lovers. Durable design perfect for daily use.',
                             ),
                             ProductCard(
                               title: 'Portsmouth City Notebook',
                               price: '£25.00',
                               imageUrl:
                                   'https://shop.upsu.net/cdn/shop/files/PortsmouthCityNotebook_1024x1024@2x.jpg?v=1757419215',
+                              description:
+                                  'High-quality notebook with Portsmouth city themed cover design. Features lined pages perfect for note-taking, journaling, or sketching. Essential for every student.',
                             ),
                           ],
                         ),
@@ -1039,19 +1067,30 @@ class ProductCard extends StatelessWidget {
   final String title;
   final String price;
   final String imageUrl;
+  final String description; // ADD THIS
 
   const ProductCard({
     super.key,
     required this.title,
     required this.price,
     required this.imageUrl,
+    required this.description, // ADD THIS
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/product');
+        Navigator.pushNamed(
+          context,
+          '/product',
+          arguments: {
+            'title': title,
+            'price': price,
+            'imageUrl': imageUrl,
+            'description': description, // ADD THIS
+          },
+        );
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
