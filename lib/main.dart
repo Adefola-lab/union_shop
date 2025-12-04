@@ -708,7 +708,10 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 40, horizontal: 300),
+                    EdgeInsets.symmetric(
+                      vertical: 40,
+                      horizontal: MediaQuery.of(context).size.width > 1200 ? 200 : MediaQuery.of(context).size.width > 768 ? 60: 20,
+                      ),
                 child: Column(
                   children: [
                     const Text(
@@ -946,77 +949,144 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Personal Touch Section
                     const SizedBox(height: 64),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Left side - Text and Button
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Add a Personal Touch',
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              const Text(
-                                'First add your item of clothing to your cart then click below to add your text! One line of text contains 10 characters!',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                  height: 1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 32),
-                              ElevatedButton(
-                                onPressed: placeholderCallbackForButtons,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4d2963),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 32,
-                                    vertical: 16,
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isMobile = constraints.maxWidth < 768;
+                        return isMobile
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Add a Personal Touch',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      letterSpacing: 1,
+                                    ),
                                   ),
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    'First add your item of clothing to your cart then click below to add your text! One line of text contains 10 characters!',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                      height: 1.5,
+                                    ),
                                   ),
-                                ),
-                                child: const Text(
-                                  'CLICK HERE TO ADD TEXT!',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
+                                  const SizedBox(height: 24),
+                                  ElevatedButton(
+                                    onPressed: placeholderCallbackForButtons,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF4d2963),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 16,
+                                      ),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.zero,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'CLICK HERE TO ADD TEXT!',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 48),
-                        // Right side - Image
-                        Expanded(
-                          child: Image.network(
-                            'https://shop.upsu.net/cdn/shop/files/The_Union_Print_Shack_Logo_-_smaller_1024x1024@2x.png?v=1760532830',
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[300],
-                                height: 300,
-                                child: const Center(
-                                  child: Icon(Icons.image_not_supported,
-                                      color: Colors.grey),
-                                ),
+                                  const SizedBox(height: 24),
+                                  Image.network(
+                                    'https://shop.upsu.net/cdn/shop/files/The_Union_Print_Shack_Logo_-_smaller_1024x1024@2x.png?v=1760532830',
+                                    fit: BoxFit.contain,
+                                    height: 200,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[300],
+                                        height: 200,
+                                        child: const Center(
+                                          child: Icon(Icons.image_not_supported,
+                                              color: Colors.grey),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Add a Personal Touch',
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            letterSpacing: 1,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 24),
+                                        const Text(
+                                          'First add your item of clothing to your cart then click below to add your text! One line of text contains 10 characters!',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                            height: 1.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 32),
+                                        ElevatedButton(
+                                          onPressed: placeholderCallbackForButtons,
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF4d2963),
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 32,
+                                              vertical: 16,
+                                            ),
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.zero,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'CLICK HERE TO ADD TEXT!',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 48),
+                                  Expanded(
+                                    child: Image.network(
+                                      'https://shop.upsu.net/cdn/shop/files/The_Union_Print_Shack_Logo_-_smaller_1024x1024@2x.png?v=1760532830',
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[300],
+                                          height: 300,
+                                          child: const Center(
+                                            child: Icon(Icons.image_not_supported,
+                                                color: Colors.grey),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               );
-                            },
-                          ),
-                        ),
-                      ],
+                      },
                     ),
                   ],
                 ),
@@ -1419,7 +1489,7 @@ class ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 4,
               offset: const Offset(0, 2),
@@ -1486,7 +1556,7 @@ class ProductCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ); // ADD THIS - missing closing parenthesis
   }
 }
 
@@ -1547,3 +1617,5 @@ class ImageCard extends StatelessWidget {
     );
   }
 }
+
+

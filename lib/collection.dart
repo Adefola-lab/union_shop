@@ -106,159 +106,255 @@ class _CollectionPageState extends State<CollectionPage> {
                       const SizedBox(height: 48),
 
                       // Filter and Sort Row
-                      Row(
-                        children: [
-                          // Filter by category
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isMobile = constraints.maxWidth < 768;
+
+                          if (isMobile) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Text(
-                                  'FILTER BY',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: _selectedCategory,
-                                      isExpanded: true,
-                                      items: _categories.map((category) {
-                                        return DropdownMenuItem(
-                                          value: category,
-                                          child: Text(category),
-                                        );
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _selectedCategory = value!;
-                                          _currentPage = 1;
-                                          _loadProducts();
-                                        });
-                                      },
+                                // Category dropdown
+                                DropdownButtonFormField<String>(
+                                  initialValue: _selectedCategory,
+                                  decoration: InputDecoration(
+                                    labelText: 'Category',
+                                    border: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey.shade400),
                                     ),
+                                    contentPadding:
+                                        const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 8),
                                   ),
+                                  items: _categories.map((category) {
+                                    return DropdownMenuItem(
+                                      value: category,
+                                      child: Text(category),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedCategory = value!;
+                                      _currentPage = 1;
+                                      _loadProducts();
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                // Sort dropdown
+                                DropdownButtonFormField<String>(
+                                  initialValue: _selectedCategory,
+                                  decoration: InputDecoration(
+                                    labelText: 'Sort by',
+                                    border: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey.shade400),
+                                    ),
+                                    contentPadding:
+                                        const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 8),
+                                  ),
+                                  items: const [
+                                    DropdownMenuItem(
+                                        value: 'featured', child: Text('Featured')),
+                                    DropdownMenuItem(
+                                        value: 'price-low',
+                                        child: Text('Price: Low to High')),
+                                    DropdownMenuItem(
+                                        value: 'price-high',
+                                        child: Text('Price: High to Low')),
+                                    DropdownMenuItem(
+                                        value: 'name-asc', child: Text('Name: A-Z')),
+                                    DropdownMenuItem(
+                                        value: 'name-desc', child: Text('Name: Z-A')),
+                                    DropdownMenuItem(
+                                        value: 'newest', child: Text('Newest First')),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedSort = value!;
+                                      _currentPage = 1;
+                                      _loadProducts();
+                                    });
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                // In stock checkbox
+                                CheckboxListTile(
+                                  title: const Text('Show in-stock only'),
+                                  value: _showInStockOnly,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _showInStockOnly = value!;
+                                      _currentPage = 1;
+                                      _loadProducts();
+                                    });
+                                  },
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  contentPadding: EdgeInsets.zero,
                                 ),
                               ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
+                            );
+                          }
 
-                          // Sort by
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'SORT BY',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: _selectedSort,
-                                      isExpanded: true,
-                                      items: const [
-                                        DropdownMenuItem(
-                                            value: 'featured',
-                                            child: Text('Featured')),
-                                        DropdownMenuItem(
-                                            value: 'price_low',
-                                            child: Text('Price: Low to High')),
-                                        DropdownMenuItem(
-                                            value: 'price_high',
-                                            child: Text('Price: High to Low')),
-                                        DropdownMenuItem(
-                                            value: 'name_asc',
-                                            child: Text('Name: A-Z')),
-                                        DropdownMenuItem(
-                                            value: 'name_desc',
-                                            child: Text('Name: Z-A')),
-                                        DropdownMenuItem(
-                                            value: 'newest',
-                                            child: Text('Newest')),
-                                      ],
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _selectedSort = value!;
-                                          _currentPage = 1;
-                                          _loadProducts();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(width: 16),
-
-                          // In Stock filter
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          // Desktop layout - original horizontal layout
+                          return Row(
                             children: [
-                              const Text(
-                                'IN STOCK',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
+                              // Filter by category
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'FILTER BY',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          value: _selectedCategory,
+                                          isExpanded: true,
+                                          items: _categories.map((category) {
+                                            return DropdownMenuItem(
+                                              value: category,
+                                              child: Text(category),
+                                            );
+                                          }).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedCategory = value!;
+                                              _currentPage = 1;
+                                              _loadProducts();
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Row(
+                              const SizedBox(width: 16),
+
+                              // Sort by
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'SORT BY',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.grey.shade300),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          value: _selectedSort,
+                                          isExpanded: true,
+                                          items: const [
+                                            DropdownMenuItem(
+                                                value: 'featured',
+                                                child: Text('Featured')),
+                                            DropdownMenuItem(
+                                                value: 'price_low',
+                                                child: Text('Price: Low to High')),
+                                            DropdownMenuItem(
+                                                value: 'price_high',
+                                                child: Text('Price: High to Low')),
+                                            DropdownMenuItem(
+                                                value: 'name_asc',
+                                                child: Text('Name: A-Z')),
+                                            DropdownMenuItem(
+                                                value: 'name_desc',
+                                                child: Text('Name: Z-A')),
+                                            DropdownMenuItem(
+                                                value: 'newest',
+                                                child: Text('Newest')),
+                                          ],
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedSort = value!;
+                                              _currentPage = 1;
+                                              _loadProducts();
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(width: 16),
+
+                              // In Stock filter
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Checkbox(
-                                    value: _showInStockOnly,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _showInStockOnly = value!;
-                                        _currentPage = 1;
-                                        _loadProducts();
-                                      });
-                                    },
+                                  const Text(
+                                    'IN STOCK',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
                                   ),
-                                  const Text('Only show in stock'),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Checkbox(
+                                        value: _showInStockOnly,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _showInStockOnly = value!;
+                                            _currentPage = 1;
+                                            _loadProducts();
+                                          });
+                                        },
+                                      ),
+                                      const Text('Only show in stock'),
+                                    ],
+                                  ),
                                 ],
                               ),
+
+                              const Spacer(),
+
+                              // Product count
+                              Text(
+                                '${_filteredProducts.length} products',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ],
-                          ),
-
-                          const Spacer(),
-
-                          // Product count
-                          Text(
-                            '${_filteredProducts.length} products',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 32),
