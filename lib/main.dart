@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:async'; // ADD THIS
 import 'package:union_shop/product_page.dart';
 import 'package:union_shop/about_us.dart';
-import 'package:union_shop/collection.dart'; // ADD THIS
+import 'package:union_shop/collection.dart';
+import 'package:union_shop/search_page.dart';
+import 'package:union_shop/sign_in.dart';
+import 'package:union_shop/collections_landing.dart';
+import 'package:union_shop/services/cart_service.dart';
+import 'package:union_shop/cart_page.dart';
 
 void main() {
   runApp(const UnionShopApp());
@@ -22,17 +28,29 @@ class UnionShopApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/about': (context) => const AboutUsPage(),
-        '/collection': (context) => const CollectionPage(),
+        '/collections': (context) => const CollectionsLandingPage(),
+        '/sign-in': (context) => const SignInPage(),
+        '/cart': (context) => const CartPage(),
+        '/search': (context) =>const SearchPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/product') {
-          final args = settings.arguments as Map<String, String>;
+          final args = settings.arguments as Map<String, String>?;
           return MaterialPageRoute(
             builder: (context) => ProductPage(
-              title: args['title']!,
-              price: args['price']!,
-              imageUrl: args['imageUrl']!
+              productId: args?['productId'],
+              title: args?['title'],
+              price: args?['price'],
+              imageUrl: args?['imageUrl'],
             ),
+          );
+        }
+        if (settings.name == '/collection') {
+          // CHANGE: This shows products within a specific collection
+          final collectionName = settings.arguments as String?;
+          return MaterialPageRoute(
+            builder: (context) =>
+                CollectionPage(collectionName: collectionName),
           );
         }
         return null;
@@ -41,8 +59,71 @@ class UnionShopApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentSlide = 0;
+  bool _isAutoPlaying = false; // ADD THIS
+  Timer? _autoPlayTimer; // ADD THIS
+
+  final List<Map<String, String>> _slides = [
+    {
+      'image':
+          'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=60',
+      'title': 'Essential Range - Over 20% Off!',
+      'description':
+          'Over 20% off our Essential Range. Come and grab yours while stock lasts!',
+    },
+    {
+      'image':
+          'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=800&q=60',
+      'title': 'Signature Collection',
+      'description':
+          'Premium quality hoodies and apparel. Show your Portsmouth pride!',
+    },
+    {
+      'image':
+          'https://images.unsplash.com/photo-1539533113208-f6df8cc8b543?auto=format&fit=crop&w=800&q=60',
+      'title': 'Limited Edition Merchandise',
+      'description':
+          'Exclusive designs available for a limited time only. Get yours now!',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _autoPlayTimer?.cancel(); // ADD THIS
+    super.dispose();
+  }
+
+  void _startAutoPlay() {
+    _autoPlayTimer?.cancel();
+    _autoPlayTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (mounted) {
+        _nextSlide();
+      }
+    });
+  }
+
+  void _stopAutoPlay() {
+    _autoPlayTimer?.cancel();
+  }
+
+  void _toggleAutoPlay() {
+    setState(() {
+      _isAutoPlaying = !_isAutoPlaying;
+      if (_isAutoPlaying) {
+        _startAutoPlay();
+      } else {
+        _stopAutoPlay();
+      }
+    });
+  }
 
   void navigateToHome(BuildContext context) {
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
@@ -54,6 +135,103 @@ class HomeScreen extends StatelessWidget {
 
   void placeholderCallbackForButtons() {
     // This is the event handler for buttons that don't work yet
+  }
+
+  void _showMobileMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: Colors.white,
+          child: ListView(
+            children: [
+              ListTile(
+                title: const Text('Home'),
+                onTap: () {
+                  Navigator.pop(context);
+                  navigateToHome(context);
+                },
+              ),
+              ExpansionTile(
+                title: const Text('Shop'),
+                children: [
+                  ListTile(
+                    title: const Text('Clothing'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  ListTile(
+                    title: const Text('Merchandise'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  ListTile(
+                    title: const Text('Halloween 🎃'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  ListTile(
+                    title: const Text('Signature & Essential Range'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  ListTile(
+                    title: const Text('Portsmouth City Collection'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  ListTile(
+                    title: const Text('Pride Collection 🏳️‍🌈'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  ListTile(
+                    title: const Text('Graduation 🎓'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                title: const Text('The Print Shack'),
+                children: [
+                  ListTile(
+                    title: const Text('Custom Printing'),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              ListTile(
+                title: const Text('SALE!'),
+                onTap: () => Navigator.pop(context),
+              ),
+              ListTile(
+                title: const Text('About'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/about');
+                },
+              ),
+              ListTile(
+                title: const Text('UPSU.net'),
+                onTap: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _nextSlide() {
+    setState(() {
+      _currentSlide = (_currentSlide + 1) % _slides.length;
+    });
+  }
+
+  void _previousSlide() {
+    setState(() {
+      _currentSlide = (_currentSlide - 1 + _slides.length) % _slides.length;
+    });
+  }
+
+  void _goToSlide(int index) {
+    setState(() {
+      _currentSlide = index;
+    });
   }
 
   @override
@@ -111,31 +289,101 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const Spacer(),
 
-                          // Navigation Menu
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextButton(
-                                onPressed: () => navigateToHome(context),
-                                child: const Text(
-                                  'Home',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                    decoration: TextDecoration.underline,
+                          // Navigation Menu - Show only on desktop
+                          if (MediaQuery.of(context).size.width > 768)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextButton(
+                                  onPressed: () => navigateToHome(context),
+                                  child: const Text(
+                                    'Home',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              PopupMenuButton<String>(
-                                offset: const Offset(0, 40),
-                                child: const TextButton(
-                                  onPressed: null,
-                                  child: Row(
+                                const SizedBox(width: 8),
+                                PopupMenuButton<String>(
+                                  offset: const Offset(0, 40),
+                                  child: const TextButton(
+                                    onPressed: null,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Shop',
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Icon(Icons.keyboard_arrow_down,
+                                            size: 16, color: Colors.black87),
+                                      ],
+                                    ),
+                                  ),
+                                  itemBuilder: (BuildContext context) => [
+                                    const PopupMenuItem<String>(
+                                      value: 'clothing',
+                                      child: Text('Clothing'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'merchandise',
+                                      child: Text('Merchandise'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'halloween',
+                                      child: Row(
+                                        children: [
+                                          Text('Halloween '),
+                                          Text('🎃'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'signature',
+                                      child:
+                                          Text('Signature & Essential Range'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'portsmouth',
+                                      child: Text('Portsmouth City Collection'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'pride',
+                                      child: Row(
+                                        children: [
+                                          Text('Pride Collection '),
+                                          Text('🏳️‍🌈'),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'graduation',
+                                      child: Row(
+                                        children: [
+                                          Text('Graduation '),
+                                          Text('🎓'),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                  onSelected: (String value) {
+                                    placeholderCallbackForButtons();
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  onPressed: placeholderCallbackForButtons,
+                                  child: const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        'Shop',
+                                        'The Print Shack',
                                         style: TextStyle(
                                           color: Colors.black87,
                                           fontSize: 14,
@@ -147,172 +395,132 @@ class HomeScreen extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                itemBuilder: (BuildContext context) => [
-                                  const PopupMenuItem<String>(
-                                    value: 'clothing',
-                                    child: Text('Clothing'),
-                                  ),
-                                  const PopupMenuItem<String>(
-                                    value: 'merchandise',
-                                    child: Text('Merchandise'),
-                                  ),
-                                  const PopupMenuItem<String>(
-                                    value: 'halloween',
-                                    child: Row(
-                                      children: [
-                                        Text('Halloween '),
-                                        Text('🎃'),
-                                      ],
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  onPressed: placeholderCallbackForButtons,
+                                  child: const Text(
+                                    'SALE!',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                  const PopupMenuItem<String>(
-                                    value: 'signature',
-                                    child: Text('Signature & Essential Range'),
-                                  ),
-                                  const PopupMenuItem<String>(
-                                    value: 'portsmouth',
-                                    child: Text('Portsmouth City Collection'),
-                                  ),
-                                  const PopupMenuItem<String>(
-                                    value: 'pride',
-                                    child: Row(
-                                      children: [
-                                        Text('Pride Collection '),
-                                        Text('🏳️‍🌈'),
-                                      ],
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pushNamed(context, '/about'),
+                                  child: const Text(
+                                    'About',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                  const PopupMenuItem<String>(
-                                    value: 'graduation',
-                                    child: Row(
-                                      children: [
-                                        Text('Graduation '),
-                                        Text('🎓'),
-                                      ],
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  onPressed: placeholderCallbackForButtons,
+                                  child: const Text(
+                                    'UPSU.net',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
                                     ),
                                   ),
-                                ],
-                                onSelected: (String value) {
-                                  // Handle menu item selection
-                                  placeholderCallbackForButtons();
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'The Print Shack',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down,
-                                        size: 16, color: Colors.black87),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Text(
-                                  'SALE!',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: () => Navigator.pushNamed(
-                                    context, '/about'), // UPDATED
-                                child: const Text(
-                                  'About',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Text(
-                                  'UPSU.net',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          const Spacer(),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 600),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.search,
-                                    size: 18,
-                                    color: Colors.grey,
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                  ),
-                                  onPressed: placeholderCallbackForButtons,
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.person_outline,
-                                    size: 18,
-                                    color: Colors.grey,
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                  ),
-                                  onPressed: placeholderCallbackForButtons,
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.shopping_bag_outlined,
-                                    size: 18,
-                                    color: Colors.grey,
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                  ),
-                                  onPressed: placeholderCallbackForButtons,
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.menu,
-                                    size: 18,
-                                    color: Colors.grey,
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                  ),
-                                  onPressed: placeholderCallbackForButtons,
                                 ),
                               ],
                             ),
+
+                          const Spacer(),
+
+                          // Right side icons
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.search,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 32,
+                                ),
+                                onPressed: () => Navigator.pushNamed(context, '/search'),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.person_outline,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 32,
+                                ),
+                                onPressed: () => Navigator.pushNamed(
+                                    context, '/sign-in'), // CHANGE THIS
+                              ),
+                              IconButton(
+                                icon: Stack(
+                                  children: [
+                                    const Icon(
+                                      Icons.shopping_bag_outlined,
+                                      size: 18,
+                                      color: Colors.grey,
+                                    ),
+                                    if (CartService().itemCount > 0)
+                                      Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(2),
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFF4d2963),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          constraints: const BoxConstraints(
+                                            minWidth: 12,
+                                            minHeight: 12,
+                                          ),
+                                          child: Text(
+                                            '${CartService().itemCount}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 32,
+                                ),
+                                onPressed: () => Navigator.pushNamed(context, '/cart'),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.menu,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 32,
+                                ),
+                                onPressed: () => _showMobileMenu(context),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -322,7 +530,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // Hero Section
+            // Hero Section with Carousel
             SizedBox(
               height: 400,
               width: double.infinity,
@@ -330,18 +538,21 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   // Background image
                   Positioned.fill(
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            'https://shop.upsu.net/cdn/shop/files/PortsmouthCityPostcard2_1024x1024@2x.jpg?v=1752232561',
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
                       child: Container(
+                        key: ValueKey<int>(_currentSlide),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.7),
+                          image: DecorationImage(
+                            image:
+                                NetworkImage(_slides[_currentSlide]['image']!),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.5),
+                          ),
                         ),
                       ),
                     ),
@@ -351,47 +562,139 @@ class HomeScreen extends StatelessWidget {
                     left: 24,
                     right: 24,
                     top: 80,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Essential Range - Over 20% Off!',
-                          style: TextStyle(
-                            fontSize: 65,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.2,
-                            letterSpacing: 1.5,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: Column(
+                        key: ValueKey<int>(_currentSlide),
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            _slides[_currentSlide]['title']!,
+                            style: const TextStyle(
+                              fontSize: 65,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              height: 1.2,
+                              letterSpacing: 1.5,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "Over 20% off our essential range. Come and grab yours while stock lasts!",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            height: 1.5,
+                          const SizedBox(height: 16),
+                          Text(
+                            _slides[_currentSlide]['description']!,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              height: 1.5,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 32),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pushNamed(
-                              context, '/collection'), // CHANGE THIS
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4d2963),
-                            foregroundColor: Colors.white,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
+                          const SizedBox(height: 32),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pushNamed(context,
+                                '/collections'), // CHANGE: Go to collections landing
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF4d2963),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 32, vertical: 16),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero,
+                              ),
+                            ),
+                            child: const Text(
+                              'BROWSE COLLECTION',
+                              style: TextStyle(fontSize: 14, letterSpacing: 1),
                             ),
                           ),
-                          child: const Text(
-                            'BROWSE PRODUCTS',
-                            style: TextStyle(fontSize: 14, letterSpacing: 1),
-                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Left arrow
+                  Positioned(
+                    left: 16,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                      ],
+                        child: IconButton(
+                          icon: const Icon(Icons.chevron_left,
+                              color: Colors.white, size: 32),
+                          onPressed: _previousSlide,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Right arrow
+                  Positioned(
+                    right: 16,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.chevron_right,
+                              color: Colors.white, size: 32),
+                          onPressed: _nextSlide,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Dots indicator
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(_slides.length, (index) {
+                        return GestureDetector(
+                          onTap: () => _goToSlide(index),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentSlide == index
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  // Play/Pause button - UPDATED
+                  Positioned(
+                    bottom: 20,
+                    right: 20,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          _isAutoPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        onPressed: _toggleAutoPlay,
+                        tooltip: _isAutoPlaying
+                            ? 'Pause auto-play'
+                            : 'Start auto-play',
+                      ),
                     ),
                   ),
                 ],
@@ -416,7 +719,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 48),
 
-                    // First Grid with Header
+                    // First Grid with Header - ESSENTIAL RANGE
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -437,20 +740,22 @@ class HomeScreen extends StatelessWidget {
                               MediaQuery.of(context).size.width > 600 ? 2 : 1,
                           crossAxisSpacing: 24,
                           mainAxisSpacing: 48,
+                          childAspectRatio:
+                              0.75, // ADD THIS for better proportions
                           children: const [
                             ProductCard(
-                              title: 'Limited Edition Essential Hoodies',
+                              title: 'Essential Range Hoodie',
                               price: '£20.00',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2409871423/display_1500/stock-photo-a-mock-up-template-of-a-white-hoodie-worn-by-a-man-a-design-concept-for-print-and-branding-a-2409871423.jpg',
+                                  'https://images.unsplash.com/photo-1513789181297-6f2ec112c0bc?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGhvb2RpZXxlbnwwfHwwfHx8MA%3D%3D',
                               description:
                                   'Premium quality essential hoodie from our limited edition collection. Made with soft, comfortable fabric perfect for everyday wear. Available in multiple colors and sizes.',
                             ),
                             ProductCard(
-                              title: 'Essential T-Shirt',
-                              price: '£10.00',
+                              title: 'Essential Range T-Shirt',
+                              price: '£9.99',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2521327419/display_1500/stock-photo-man-wearing-an-oversize-t-shirt-2521327419.jpg',
+                                  'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=800&q=60',
                               description:
                                   'Classic essential t-shirt designed for comfort and style. Made from high-quality cotton blend material. Perfect for casual wear or layering.',
                             ),
@@ -480,12 +785,14 @@ class HomeScreen extends StatelessWidget {
                               MediaQuery.of(context).size.width > 600 ? 2 : 1,
                           crossAxisSpacing: 24,
                           mainAxisSpacing: 48,
+                          childAspectRatio:
+                              0.75, // MAKE SURE THIS IS CONSISTENT
                           children: const [
                             ProductCard(
                               title: 'Signature Hoodie',
                               price: '£32.99',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2603337191/display_1500/stock-photo-person-in-a-cream-hoodie-stands-against-a-stone-building-casual-hoodie-style-urban-setting-2603337191.jpg',
+                                  'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=800&q=60',
                               description:
                                   'Our premium signature hoodie featuring the iconic Portsmouth University design. Crafted with superior materials for maximum comfort and durability. A must-have for any student wardrobe.',
                             ),
@@ -493,7 +800,7 @@ class HomeScreen extends StatelessWidget {
                               title: 'Signature T-Shirt',
                               price: '£14.99',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2470399579/display_1500/stock-photo-male-and-female-fashionable-t-shirt-motivational-quote-t-shirt-for-gym-2470399579.jpg',
+                                  'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=60',
                               description:
                                   'Show your Portsmouth pride with our signature t-shirt. Features distinctive university branding and motivational design. Made from breathable, comfortable fabric suitable for all-day wear.',
                             ),
@@ -565,7 +872,8 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 48),
                     Center(
                       child: ElevatedButton(
-                        onPressed: placeholderCallbackForButtons,
+                        onPressed: () => Navigator.pushNamed(context,
+                            '/collections'), // CHANGE: Go to collections landing
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF4d2963),
                           foregroundColor: Colors.white,
@@ -612,22 +920,22 @@ class HomeScreen extends StatelessWidget {
                             ImageCard(
                               title: 'Clothing',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2546478191/display_1500/stock-photo-women-s-sweaters-with-long-sleeves-isolated-on-white-background-2546478191.jpg',
+                                  'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=800&q=60',
                             ),
                             ImageCard(
                               title: 'Merchandise',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2604856497/display_1500/stock-photo-different-blank-items-for-branding-on-beige-background-flat-lay-mockup-for-design-2604856497.jpg',
+                                  'https://images.unsplash.com/photo-1656360088907-5109c245851d?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWVyY2hhbmRpc2V8ZW58MHx8MHx8fDA%3D',
                             ),
                             ImageCard(
                               title: 'Graduation',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2236038943/display_1500/stock-photo-graduates-wear-a-black-dress-black-hat-at-the-university-level-2236038943.jpg',
+                                  'https://images.unsplash.com/photo-1559443065-db5f9290a1a7?w=700&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Z3JhZHVhdGlvbiUyMGdvd258ZW58MHx8MHx8fDA%3D',
                             ),
                             ImageCard(
                               title: 'SALE',
                               imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2057591057/display_1500/stock-photo-black-friday-sale-or-discount-banner-red-clothes-tag-over-black-background-modern-minimal-design-2057591057.jpg',
+                                  'https://images.unsplash.com/photo-1607083206968-13611e3d76db?auto=format&fit=crop&w=800&q=60',
                             ),
                           ],
                         ),
@@ -857,7 +1165,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 16),
                               InkWell(
-                                onTap: placeholderCallbackForButtons,
+                                onTap: () => Navigator.pushNamed(context, '/search'),
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 4),
                                   child: Text(
@@ -1067,71 +1375,113 @@ class ProductCard extends StatelessWidget {
   final String title;
   final String price;
   final String imageUrl;
-  final String description; // ADD THIS
+  final String description;
+  final String? productId;
 
   const ProductCard({
     super.key,
     required this.title,
     required this.price,
     required this.imageUrl,
-    required this.description, // ADD THIS
+    required this.description,
+    this.productId,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/product',
-          arguments: {
-            'title': title,
-            'price': price,
-            'imageUrl': imageUrl,
-            'description': description, // ADD THIS
-          },
-        );
+        if (productId != null) {
+          Navigator.pushNamed(
+            context,
+            '/product',
+            arguments: {'productId': productId},
+          );
+        } else {
+          Navigator.pushNamed(
+            context,
+            '/product',
+            arguments: {
+              'title': title,
+              'price': price,
+              'imageUrl': imageUrl,
+              'description': description,
+            },
+          );
+        }
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[300],
-                  child: const Center(
-                    child: Icon(Icons.image_not_supported, color: Colors.grey),
-                  ),
-                );
-              },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-                maxLines: 2,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image section
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(8)),
+                child: Image.network(
+                  imageUrl,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: Icon(Icons.image_not_supported,
+                            color: Colors.grey, size: 48),
+                      ),
+                    );
+                  },
+                ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                price,
-                style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey),
+            ),
+            // Text section
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      price,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF4d2963),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

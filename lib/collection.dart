@@ -1,7 +1,62 @@
 import 'package:flutter/material.dart';
+import 'models/product.dart';
+import 'services/product_service.dart';
 
-class CollectionPage extends StatelessWidget {
-  const CollectionPage({super.key});
+class CollectionPage extends StatefulWidget {
+  final String? collectionName;
+
+  const CollectionPage({super.key, this.collectionName});
+
+  @override
+  State<CollectionPage> createState() => _CollectionPageState();
+}
+
+class _CollectionPageState extends State<CollectionPage> {
+  String _selectedCategory = 'All products';
+  String _selectedSort = 'featured';
+  bool _showInStockOnly = false;
+  int _currentPage = 1;
+  final int _itemsPerPage = 6;
+
+  List<Product> _filteredProducts = [];
+  final List<String> _categories = ['All products'];
+
+  @override
+  void initState() {
+    super.initState();
+    _categories.addAll(ProductService.getAllCategories());
+
+    // Set initial category based on collection name if provided
+    if (widget.collectionName != null) {
+      // Map collection names to categories if they exist
+      if (_categories.contains(widget.collectionName)) {
+        _selectedCategory = widget.collectionName!;
+      }
+    }
+
+    _loadProducts();
+  }
+
+  void _loadProducts() {
+    setState(() {
+      _filteredProducts = ProductService.getProducts(
+        category: _selectedCategory,
+        inStock: _showInStockOnly ? true : null,
+        sortBy: _selectedSort,
+      );
+    });
+  }
+
+  int get _totalPages => (_filteredProducts.length / _itemsPerPage).ceil();
+
+  List<Product> get _paginatedProducts {
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = startIndex + _itemsPerPage;
+    return _filteredProducts.sublist(
+      startIndex,
+      endIndex > _filteredProducts.length ? _filteredProducts.length : endIndex,
+    );
+  }
 
   void navigateToHome(BuildContext context) {
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
@@ -16,600 +71,580 @@ class CollectionPage extends StatelessWidget {
         child: Column(
           children: [
             // Header (same as main)
+            _buildHeader(context),
+
+            // Collection Content
             Container(
-              height: 100,
               color: Colors.white,
-              child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    color: const Color(0xFF4d2963),
-                    child: const Text(
-                      'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 40),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1400),
+                  child: Column(
+                    children: [
+                      // Title - Use collection name or default
+                      Text(
+                        widget.collectionName ?? 'All Products',
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
+                      const SizedBox(height: 16),
+                      Text(
+                        widget.collectionName != null
+                            ? 'Shop all products in ${widget.collectionName}'
+                            : 'Shop all of this seasons must haves in one place!',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 48),
+
+                      // Filter and Sort Row
+                      Row(
                         children: [
-                          GestureDetector(
-                            onTap: () => navigateToHome(context),
-                            child: Image.network(
-                              'https://shop.upsu.net/cdn/shop/files/upsu_300x300.png?v=1614735854',
-                              height: 18,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[300],
-                                  width: 18,
-                                  height: 18,
-                                  child: const Center(
-                                    child: Icon(Icons.image_not_supported,
-                                        color: Colors.grey),
+                          // Filter by category
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'FILTER BY',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
                                   ),
-                                );
-                              },
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _selectedCategory,
+                                      isExpanded: true,
+                                      items: _categories.map((category) {
+                                        return DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedCategory = value!;
+                                          _currentPage = 1;
+                                          _loadProducts();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const Spacer(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextButton(
-                                onPressed: () => navigateToHome(context),
-                                child: const Text('Home',
-                                    style: TextStyle(
-                                        color: Colors.black87, fontSize: 14)),
-                              ),
-                              const SizedBox(width: 8),
-                              PopupMenuButton<String>(
-                                offset: const Offset(0, 40),
-                                child: const TextButton(
-                                  onPressed: null,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text('Shop',
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 14,
-                                              decoration:
-                                                  TextDecoration.underline)),
-                                      SizedBox(width: 4),
-                                      Icon(Icons.keyboard_arrow_down,
-                                          size: 16, color: Colors.black87),
-                                    ],
+                          const SizedBox(width: 16),
+
+                          // Sort by
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'SORT BY',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
                                   ),
                                 ),
-                                itemBuilder: (BuildContext context) => [
-                                  const PopupMenuItem<String>(
-                                      value: 'clothing',
-                                      child: Text('Clothing')),
-                                  const PopupMenuItem<String>(
-                                      value: 'merchandise',
-                                      child: Text('Merchandise')),
-                                  const PopupMenuItem<String>(
-                                      value: 'halloween',
-                                      child: Row(children: [
-                                        Text('Halloween '),
-                                        Text('🎃')
-                                      ])),
-                                  const PopupMenuItem<String>(
-                                      value: 'signature',
-                                      child:
-                                          Text('Signature & Essential Range')),
-                                  const PopupMenuItem<String>(
-                                      value: 'portsmouth',
-                                      child:
-                                          Text('Portsmouth City Collection')),
-                                  const PopupMenuItem<String>(
-                                      value: 'pride',
-                                      child: Row(children: [
-                                        Text('Pride Collection '),
-                                        Text('🏳️‍🌈')
-                                      ])),
-                                  const PopupMenuItem<String>(
-                                      value: 'graduation',
-                                      child: Row(children: [
-                                        Text('Graduation '),
-                                        Text('🎓')
-                                      ])),
-                                ],
-                                onSelected: (String value) =>
-                                    placeholderCallbackForButtons(),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text('The Print Shack',
-                                        style: TextStyle(
-                                            color: Colors.black87,
-                                            fontSize: 14)),
-                                    SizedBox(width: 4),
-                                    Icon(Icons.keyboard_arrow_down,
-                                        size: 16, color: Colors.black87),
-                                  ],
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: _selectedSort,
+                                      isExpanded: true,
+                                      items: const [
+                                        DropdownMenuItem(
+                                            value: 'featured',
+                                            child: Text('Featured')),
+                                        DropdownMenuItem(
+                                            value: 'price_low',
+                                            child: Text('Price: Low to High')),
+                                        DropdownMenuItem(
+                                            value: 'price_high',
+                                            child: Text('Price: High to Low')),
+                                        DropdownMenuItem(
+                                            value: 'name_asc',
+                                            child: Text('Name: A-Z')),
+                                        DropdownMenuItem(
+                                            value: 'name_desc',
+                                            child: Text('Name: Z-A')),
+                                        DropdownMenuItem(
+                                            value: 'newest',
+                                            child: Text('Newest')),
+                                      ],
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedSort = value!;
+                                          _currentPage = 1;
+                                          _loadProducts();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(width: 16),
+
+                          // In Stock filter
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'IN STOCK',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Text('SALE!',
-                                    style: TextStyle(
-                                        color: Colors.black87, fontSize: 14)),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.pushNamed(context, '/about'),
-                                child: const Text('About',
-                                    style: TextStyle(
-                                        color: Colors.black87, fontSize: 14)),
-                              ),
-                              const SizedBox(width: 8),
-                              TextButton(
-                                onPressed: placeholderCallbackForButtons,
-                                child: const Text('UPSU.net',
-                                    style: TextStyle(
-                                        color: Colors.black87, fontSize: 14)),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: _showInStockOnly,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _showInStockOnly = value!;
+                                        _currentPage = 1;
+                                        _loadProducts();
+                                      });
+                                    },
+                                  ),
+                                  const Text('Only show in stock'),
+                                ],
                               ),
                             ],
                           ),
+
                           const Spacer(),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                  icon: const Icon(Icons.search,
-                                      size: 18, color: Colors.grey),
-                                  onPressed: placeholderCallbackForButtons),
-                              IconButton(
-                                  icon: const Icon(Icons.person_outline,
-                                      size: 18, color: Colors.grey),
-                                  onPressed: placeholderCallbackForButtons),
-                              IconButton(
-                                  icon: const Icon(Icons.shopping_bag_outlined,
-                                      size: 18, color: Colors.grey),
-                                  onPressed: placeholderCallbackForButtons),
-                              IconButton(
-                                  icon: const Icon(Icons.menu,
-                                      size: 18, color: Colors.grey),
-                                  onPressed: placeholderCallbackForButtons),
-                            ],
+
+                          // Product count
+                          Text(
+                            '${_filteredProducts.length} products',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
-            // Content area with grid
-            Container(
-              color: Colors.white,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 40, horizontal: 300),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Collections',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 48),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 16),
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount:
-                              MediaQuery.of(context).size.width > 600 ? 3 : 1,
-                          mainAxisSpacing: 40,
-                          crossAxisSpacing: 40,
-                          children: const [
-                            ImageCard(
-                              title: 'Black Friday',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2057591057/display_1500/stock-photo-black-friday-sale-or-discount-banner-red-clothes-tag-over-black-background-modern-minimal-design-2057591057.jpg',
+                      const SizedBox(height: 32),
+                      const Divider(),
+                      const SizedBox(height: 32),
+
+                      // Product Grid
+                      _filteredProducts.isEmpty
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(40),
+                                child: Text(
+                                  'No products found matching your criteria.',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.grey),
+                                ),
+                              ),
+                            )
+                          : GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: MediaQuery.of(context)
+                                            .size
+                                            .width >
+                                        900
+                                    ? 3
+                                    : MediaQuery.of(context).size.width > 600
+                                        ? 2
+                                        : 1,
+                                crossAxisSpacing: 24,
+                                mainAxisSpacing: 32,
+                                childAspectRatio: 0.7,
+                              ),
+                              itemCount: _paginatedProducts.length,
+                              itemBuilder: (context, index) {
+                                final product = _paginatedProducts[index];
+                                return _buildProductCard(product);
+                              },
                             ),
-                            ImageCard(
-                              title: 'Clothing',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2546478191/display_1500/stock-photo-women-s-sweaters-with-long-sleeves-isolated-on-white-background-2546478191.jpg',
+
+                      // Pagination
+                      if (_totalPages > 1) ...[
+                        const SizedBox(height: 48),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.chevron_left),
+                              onPressed: _currentPage > 1
+                                  ? () {
+                                      setState(() {
+                                        _currentPage--;
+                                      });
+                                    }
+                                  : null,
                             ),
-                            ImageCard(
-                              title: 'Essential Range',
-                              imageUrl:
-                                  'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1200&q=60',
-                            ),
-                            ImageCard(
-                              title: 'Graduation',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2236038943/display_1500/stock-photo-graduates-wear-a-black-dress-black-hat-at-the-university-level-2236038943.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Limited Edition Merch',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2540391243/display_1500/stock-vector-modern-simple-minimal-typographic-design-of-a-saying-limited-edition-in-tones-of-grey-red-color-2540391243.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Personalisation',
-                              imageUrl:
-                                  'https://images.unsplash.com/photo-1581089781785-603411fa81e5?auto=format&fit=crop&w=1200&q=60',
-                            ),
-                            ImageCard(
-                              title: 'SALE',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2057591057/display_1500/stock-photo-black-friday-sale-or-discount-banner-red-clothes-tag-over-black-background-modern-minimal-design-2057591057.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Merchandise',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2604856497/display_1500/stock-photo-different-blank-items-for-branding-on-beige-background-flat-lay-mockup-for-design-2604856497.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Winter',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2223881507/display_1500/stock-photo-full-length-of-cheerful-woman-in-faux-fur-jacket-and-stylish-eyeglasses-walking-on-blue-2223881507.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Spring',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2027170712/display_1500/stock-photo-profile-side-photo-of-young-handsome-man-happy-positive-smile-curious-dreamy-walk-park-nature-2027170712.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Summer',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2260331207/display_1500/stock-photo-funny-cheerful-man-wearing-life-buoy-waist-having-fun-and-fooling-around-on-light-green-background-2260331207.jpg',
-                            ),
-                            ImageCard(
-                              title: 'Autumn',
-                              imageUrl:
-                                  'https://www.shutterstock.com/shutterstock/photos/2382171027/display_1500/stock-photo-fashion-autumnal-outfit-knitted-brown-sweater-with-hat-pants-and-handbag-women-s-warm-jumper-2382171027.jpg',
+                            const SizedBox(width: 16),
+                            ...List.generate(_totalPages, (index) {
+                              final pageNum = index + 1;
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _currentPage = pageNum;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _currentPage == pageNum
+                                        ? const Color(0xFF4d2963)
+                                        : Colors.white,
+                                    foregroundColor: _currentPage == pageNum
+                                        ? Colors.white
+                                        : Colors.black,
+                                    side: BorderSide(
+                                      color: _currentPage == pageNum
+                                          ? const Color(0xFF4d2963)
+                                          : Colors.grey.shade300,
+                                    ),
+                                    shape: const CircleBorder(),
+                                    padding: const EdgeInsets.all(12),
+                                  ),
+                                  child: Text('$pageNum'),
+                                ),
+                              );
+                            }),
+                            const SizedBox(width: 16),
+                            IconButton(
+                              icon: const Icon(Icons.chevron_right),
+                              onPressed: _currentPage < _totalPages
+                                  ? () {
+                                      setState(() {
+                                        _currentPage++;
+                                      });
+                                    }
+                                  : null,
                             ),
                           ],
-                        )
+                        ),
                       ],
-                    )
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
 
             // Footer (same as main)
-            Container(
-              width: double.infinity,
-              color: Colors.grey[50],
-              child: Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 40, horizontal: 40),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isWide = constraints.maxWidth >= 900;
-                          const openingHours = Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Opening Hours',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87)),
-                              SizedBox(height: 16),
-                              Text('❄️ Winter Break Closure Dates ❄️',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              Text('Closing 4pm 19/12/2025',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              Text('Reopening 10am 05/01/2026',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              SizedBox(height: 8),
-                              Text('Last post date: 12pm on 18/12/2025',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              SizedBox(height: 8),
-                              Text('-------------------------',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              SizedBox(height: 8),
-                              Text('(Term Time)',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              Text('Monday - Friday 10am - 4pm',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              SizedBox(height: 8),
-                              Text(
-                                  '(Outside of Term Time / Consolidation Weeks)',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              Text('Monday - Friday 10am - 3pm',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                              SizedBox(height: 8),
-                              Text('Purchase online 24/7',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                      height: 1.6)),
-                            ],
-                          );
-                          final helpInfo = Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Help and Information',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87)),
-                              const SizedBox(height: 16),
-                              InkWell(
-                                  onTap: placeholderCallbackForButtons,
-                                  child: const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 4),
-                                      child: Text('Search',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              height: 1.6)))),
-                              InkWell(
-                                  onTap: placeholderCallbackForButtons,
-                                  child: const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 4),
-                                      child: Text('Terms & Conditions of Sale',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              height: 1.6)))),
-                              InkWell(
-                                  onTap: placeholderCallbackForButtons,
-                                  child: const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 4),
-                                      child: Text('Policy',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              height: 1.6)))),
-                            ],
-                          );
-                          final latestOffers = Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Latest Offers',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87)),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(
-                                      child: TextField(
-                                          decoration: InputDecoration(
-                                              hintText: 'Email address',
-                                              isDense: true,
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 14),
-                                              border: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: Colors
-                                                          .grey.shade400)),
-                                              enabledBorder: OutlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: Colors
-                                                          .grey.shade400))))),
-                                  const SizedBox(width: 0),
-                                  ElevatedButton(
-                                      onPressed: placeholderCallbackForButtons,
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFF4d2963),
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 24, vertical: 20),
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.zero)),
-                                      child: const Text('SUBSCRIBE',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold))),
-                                ],
-                              ),
-                            ],
-                          );
-                          return isWide
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                      const Expanded(child: openingHours),
-                                      const SizedBox(width: 60),
-                                      Expanded(child: helpInfo),
-                                      const SizedBox(width: 60),
-                                      Expanded(child: latestOffers)
-                                    ])
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                      openingHours,
-                                      const SizedBox(height: 32),
-                                      helpInfo,
-                                      const SizedBox(height: 32),
-                                      latestOffers
-                                    ]);
-                        },
-                      ),
-                    ),
-                    Divider(
-                        height: 1, thickness: 1, color: Colors.grey.shade300),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 24, horizontal: 40),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(children: [
-                            Icon(Icons.facebook,
-                                size: 24, color: Colors.black87),
-                            SizedBox(width: 16),
-                            Icon(Icons.flutter_dash,
-                                size: 24, color: Colors.black87)
-                          ]),
-                          const SizedBox(height: 16),
-                          Wrap(spacing: 8, runSpacing: 8, children: [
-                            Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(4)),
-                                child: const Icon(Icons.apple,
-                                    size: 20, color: Colors.black87)),
-                            Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
-                                    borderRadius: BorderRadius.circular(4)),
-                                child: const Icon(Icons.credit_card,
-                                    size: 20, color: Colors.black87)),
-                          ]),
-                          const SizedBox(height: 16),
-                          const Text('© 2025, upsu-store    Powered by Shopify',
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black54)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            _buildFooter(),
           ],
         ),
       ),
     );
   }
-}
 
-class ImageCard extends StatelessWidget {
-  final String title;
-  final String imageUrl;
-
-  const ImageCard({
-    super.key,
-    required this.title,
-    required this.imageUrl,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildProductCard(Product product) {
     return GestureDetector(
       onTap: () {
-        // No action for now
+        Navigator.pushNamed(
+          context,
+          '/product',
+          arguments: {
+            'title': product.title,
+            'price': '£${product.price.toStringAsFixed(2)}',
+            'imageUrl': product.imageUrl,
+            'description': product.description,
+          },
+        );
       },
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Background image
-          Positioned.fill(
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[300],
-                  child: const Center(
-                    child: Icon(Icons.image_not_supported, color: Colors.grey),
-                  ),
-                );
-              },
-            ),
-          ),
-          // Dark overlay
-          Positioned.fill(
+          Expanded(
             child: Container(
-              color: Colors.black.withValues(alpha: 0.4),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      product.imageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(Icons.image_not_supported,
+                              size: 64, color: Colors.grey),
+                        );
+                      },
+                    ),
+                  ),
+                  if (!product.inStock)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'OUT OF STOCK',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-          // Centered text
-          Center(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1,
-              ),
-              textAlign: TextAlign.center,
+          const SizedBox(height: 12),
+          Text(
+            product.title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '£${product.price.toStringAsFixed(2)}',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF4d2963),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    // Same header as main page - copy from main.dart
+    return Container(
+      height: 100,
+      color: Colors.white,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            color: const Color(0xFF4d2963),
+            child: const Text(
+              'BIG SALE! OUR ESSENTIAL RANGE HAS DROPPED IN PRICE! OVER 20% OFF! COME GRAB YOURS WHILE STOCK LASTS!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => navigateToHome(context),
+                    child: Image.network(
+                      'https://shop.upsu.net/cdn/shop/files/upsu_300x300.png?v=1614735854',
+                      height: 18,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          width: 18,
+                          height: 18,
+                          child: const Center(
+                              child: Icon(Icons.image_not_supported,
+                                  color: Colors.grey)),
+                        );
+                      },
+                    ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () => navigateToHome(context),
+                        child: const Text('Home',
+                            style:
+                                TextStyle(color: Colors.black87, fontSize: 14)),
+                      ),
+                      const SizedBox(width: 8),
+                      PopupMenuButton<String>(
+                        offset: const Offset(0, 40),
+                        child: const TextButton(
+                          onPressed: null,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Shop',
+                                  style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 14,
+                                      decoration: TextDecoration.underline)),
+                              SizedBox(width: 4),
+                              Icon(Icons.keyboard_arrow_down,
+                                  size: 16, color: Colors.black87),
+                            ],
+                          ),
+                        ),
+                        itemBuilder: (BuildContext context) => const [
+                          PopupMenuItem<String>(
+                              value: 'clothing', child: Text('Clothing')),
+                          PopupMenuItem<String>(
+                              value: 'merchandise', child: Text('Merchandise')),
+                          PopupMenuItem<String>(
+                              value: 'halloween',
+                              child: Row(
+                                  children: [Text('Halloween '), Text('🎃')])),
+                          PopupMenuItem<String>(
+                              value: 'signature',
+                              child: Text('Signature & Essential Range')),
+                          PopupMenuItem<String>(
+                              value: 'portsmouth',
+                              child: Text('Portsmouth City Collection')),
+                          PopupMenuItem<String>(
+                              value: 'pride',
+                              child: Row(children: [
+                                Text('Pride Collection '),
+                                Text('🏳️‍🌈')
+                              ])),
+                          PopupMenuItem<String>(
+                              value: 'graduation',
+                              child: Row(
+                                  children: [Text('Graduation '), Text('🎓')])),
+                        ],
+                        onSelected: (String value) =>
+                            placeholderCallbackForButtons(),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: placeholderCallbackForButtons,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('The Print Shack',
+                                style: TextStyle(
+                                    color: Colors.black87, fontSize: 14)),
+                            SizedBox(width: 4),
+                            Icon(Icons.keyboard_arrow_down,
+                                size: 16, color: Colors.black87),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                          onPressed: placeholderCallbackForButtons,
+                          child: const Text('SALE!',
+                              style: TextStyle(
+                                  color: Colors.black87, fontSize: 14))),
+                      const SizedBox(width: 8),
+                      TextButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/about'),
+                          child: const Text('About',
+                              style: TextStyle(
+                                  color: Colors.black87, fontSize: 14))),
+                      const SizedBox(width: 8),
+                      TextButton(
+                          onPressed: placeholderCallbackForButtons,
+                          child: const Text('UPSU.net',
+                              style: TextStyle(
+                                  color: Colors.black87, fontSize: 14))),
+                    ],
+                  ),
+                  const Spacer(),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                          icon: const Icon(Icons.search,
+                              size: 18, color: Colors.grey),
+                          onPressed: () => Navigator.pushNamed(context, '/search'),),
+                      IconButton(
+                          icon: const Icon(Icons.person_outline,
+                              size: 18, color: Colors.grey),
+                          onPressed: placeholderCallbackForButtons),
+                      IconButton(
+                          icon: const Icon(Icons.shopping_bag_outlined,
+                              size: 18, color: Colors.grey),
+                          onPressed: placeholderCallbackForButtons),
+                      IconButton(
+                          icon: const Icon(Icons.menu,
+                              size: 18, color: Colors.grey),
+                          onPressed: placeholderCallbackForButtons),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    // Same footer as main page - copy from main.dart
+    return Container(
+      width: double.infinity,
+      color: Colors.grey[50],
+      child: const Padding(
+        padding: EdgeInsets.all(40.0),
+        child: Center(
+          child: Text('Footer - Copy from main.dart',
+              style: TextStyle(color: Colors.grey)),
+        ),
       ),
     );
   }

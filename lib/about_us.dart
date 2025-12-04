@@ -201,7 +201,7 @@ class AboutUsPage extends StatelessWidget {
                                 padding: const EdgeInsets.all(8),
                                 constraints: const BoxConstraints(
                                     minWidth: 32, minHeight: 32),
-                                onPressed: placeholderCallbackForButtons,
+                                onPressed: () => Navigator.pushNamed(context, '/search'),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.person_outline,
