@@ -31,7 +31,7 @@ class UnionShopApp extends StatelessWidget {
         '/collections': (context) => const CollectionsLandingPage(),
         '/sign-in': (context) => const SignInPage(),
         '/cart': (context) => const CartPage(),
-        '/search': (context) =>const SearchPage(),
+        '/search': (context) => const SearchPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/product') {
@@ -449,7 +449,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   minWidth: 32,
                                   minHeight: 32,
                                 ),
-                                onPressed: () => Navigator.pushNamed(context, '/search'),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/search'),
                               ),
                               IconButton(
                                 icon: const Icon(
@@ -505,7 +506,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   minWidth: 32,
                                   minHeight: 32,
                                 ),
-                                onPressed: () => Navigator.pushNamed(context, '/cart'),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/cart'),
                               ),
                               IconButton(
                                 icon: const Icon(
@@ -1165,7 +1167,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 16),
                               InkWell(
-                                onTap: () => Navigator.pushNamed(context, '/search'),
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/search'),
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 4),
                                   child: Text(

@@ -162,7 +162,8 @@ class _CartPageState extends State<CartPage> {
                         ),
                         const SizedBox(width: 8),
                         TextButton(
-                          onPressed: () => Navigator.pushNamed(context, '/about'),
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/about'),
                           child: const Text(
                             'About',
                             style: TextStyle(
@@ -178,23 +179,30 @@ class _CartPageState extends State<CartPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.search, size: 18, color: Colors.grey),
+                        icon: const Icon(Icons.search,
+                            size: 18, color: Colors.grey),
                         padding: const EdgeInsets.all(8),
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                        constraints:
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
                         onPressed: placeholderCallbackForButtons,
                       ),
                       IconButton(
-                        icon: const Icon(Icons.person_outline, size: 18, color: Colors.grey),
+                        icon: const Icon(Icons.person_outline,
+                            size: 18, color: Colors.grey),
                         padding: const EdgeInsets.all(8),
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                        onPressed: () => Navigator.pushNamed(context, '/sign-in'),
+                        constraints:
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/sign-in'),
                       ),
                       Stack(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.shopping_bag_outlined, size: 18, color: Colors.grey),
+                            icon: const Icon(Icons.shopping_bag_outlined,
+                                size: 18, color: Colors.grey),
                             padding: const EdgeInsets.all(8),
-                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                            constraints: const BoxConstraints(
+                                minWidth: 32, minHeight: 32),
                             onPressed: () {},
                           ),
                           if (_cartService.itemCount > 0)
@@ -225,9 +233,11 @@ class _CartPageState extends State<CartPage> {
                         ],
                       ),
                       IconButton(
-                        icon: const Icon(Icons.menu, size: 18, color: Colors.grey),
+                        icon: const Icon(Icons.menu,
+                            size: 18, color: Colors.grey),
                         padding: const EdgeInsets.all(8),
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                        constraints:
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
                         onPressed: () => _showMobileMenu(context),
                       ),
                     ],
@@ -249,7 +259,8 @@ class _CartPageState extends State<CartPage> {
         child: Center(
           child: Column(
             children: [
-              const Icon(Icons.shopping_cart_outlined, size: 100, color: Colors.grey),
+              const Icon(Icons.shopping_cart_outlined,
+                  size: 100, color: Colors.grey),
               const SizedBox(height: 24),
               const Text(
                 'Your cart is empty',
@@ -261,8 +272,10 @@ class _CartPageState extends State<CartPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF4d2963),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero),
                 ),
                 child: const Text('CONTINUE SHOPPING'),
               ),
@@ -322,7 +335,8 @@ class _CartPageState extends State<CartPage> {
             errorBuilder: (context, error, stackTrace) {
               return Container(
                 color: Colors.grey[300],
-                child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                child:
+                    const Icon(Icons.image_not_supported, color: Colors.grey),
               );
             },
           ),
@@ -335,17 +349,21 @@ class _CartPageState extends State<CartPage> {
             children: [
               Text(
                 item.title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               if (item.size != null)
-                Text('Size: ${item.size}', style: TextStyle(color: Colors.grey[600])),
+                Text('Size: ${item.size}',
+                    style: TextStyle(color: Colors.grey[600])),
               if (item.color != null)
-                Text('Color: ${item.color}', style: TextStyle(color: Colors.grey[600])),
+                Text('Color: ${item.color}',
+                    style: TextStyle(color: Colors.grey[600])),
               const SizedBox(height: 8),
               Text(
                 '£${item.price.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -358,7 +376,8 @@ class _CartPageState extends State<CartPage> {
                 IconButton(
                   icon: const Icon(Icons.remove, size: 16),
                   onPressed: () {
-                    _cartService.updateQuantity(item.variantKey, item.quantity - 1);
+                    _cartService.updateQuantity(
+                        item.variantKey, item.quantity - 1);
                   },
                   style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -372,13 +391,15 @@ class _CartPageState extends State<CartPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     '${item.quantity}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.add, size: 16),
                   onPressed: () {
-                    _cartService.updateQuantity(item.variantKey, item.quantity + 1);
+                    _cartService.updateQuantity(
+                        item.variantKey, item.quantity + 1);
                   },
                   style: IconButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -443,11 +464,15 @@ class _CartPageState extends State<CartPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Text('Total:', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const Text('Total:',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(width: 16),
             Text(
               '£${_cartService.total.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF4d2963)),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF4d2963)),
             ),
           ],
         ),
@@ -458,9 +483,11 @@ class _CartPageState extends State<CartPage> {
             OutlinedButton(
               onPressed: () => navigateToHome(context),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 side: const BorderSide(color: Color(0xFF4d2963)),
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero),
               ),
               child: const Text(
                 'CONTINUE SHOPPING',
@@ -473,8 +500,10 @@ class _CartPageState extends State<CartPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4d2963),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero),
               ),
               child: const Text('CHECKOUT'),
             ),
@@ -494,7 +523,10 @@ class _CartPageState extends State<CartPage> {
           children: [
             Text(
               '© 2025, upsu-store    Powered by Shopify',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+              style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54),
             ),
           ],
         ),

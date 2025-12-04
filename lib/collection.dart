@@ -608,9 +608,11 @@ class _CollectionPageState extends State<CollectionPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                          icon: const Icon(Icons.search,
-                              size: 18, color: Colors.grey),
-                          onPressed: () => Navigator.pushNamed(context, '/search'),),
+                        icon: const Icon(Icons.search,
+                            size: 18, color: Colors.grey),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/search'),
+                      ),
                       IconButton(
                           icon: const Icon(Icons.person_outline,
                               size: 18, color: Colors.grey),

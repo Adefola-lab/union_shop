@@ -34,32 +34,32 @@ class _ProductPageState extends State<ProductPage> {
     _loadProduct();
   }
 
-void _addToCart() {
-  if (_product == null) return;
+  void _addToCart() {
+    if (_product == null) return;
 
-  final cartItem = CartItem(
-    productId: _product!.id,
-    title: _product!.title,
-    price: _product!.price,
-    imageUrl: _product!.imageUrl,
-    size: _selectedSize,
-    color: _selectedColor,
-    quantity: _quantity,
-  );
+    final cartItem = CartItem(
+      productId: _product!.id,
+      title: _product!.title,
+      price: _product!.price,
+      imageUrl: _product!.imageUrl,
+      size: _selectedSize,
+      color: _selectedColor,
+      quantity: _quantity,
+    );
 
-  CartService().addItem(cartItem);
+    CartService().addItem(cartItem);
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: const Text('Added to cart!'),
-      duration: const Duration(seconds: 2),
-      action: SnackBarAction(
-        label: 'VIEW CART',
-        onPressed: () => Navigator.pushNamed(context, '/cart'),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Added to cart!'),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'VIEW CART',
+          onPressed: () => Navigator.pushNamed(context, '/cart'),
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _loadProduct() {
     if (widget.productId != null) {
@@ -572,7 +572,8 @@ void _addToCart() {
                       IconButton(
                         icon: const Icon(Icons.search,
                             size: 18, color: Colors.grey),
-                        onPressed: () => Navigator.pushNamed(context, '/search'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/search'),
                       ),
                       IconButton(
                         icon: const Icon(Icons.person_outline,
