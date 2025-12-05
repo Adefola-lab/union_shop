@@ -17,7 +17,7 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
   final _line1Controller = TextEditingController();
   final _line2Controller = TextEditingController();
   int _quantity = 1;
-  
+
   final double _pricePerLine = 3.00;
   final int _maxCharsPerLine = 10;
 
@@ -49,7 +49,8 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
       return;
     }
 
-    if (_selectedLines == 'Two Lines of Text' && _line2Controller.text.isEmpty) {
+    if (_selectedLines == 'Two Lines of Text' &&
+        _line2Controller.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please enter text for Line 2'),
@@ -68,7 +69,8 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
       productId: 'personalisation-${DateTime.now().millisecondsSinceEpoch}',
       title: 'Personalisation - $_selectedLines',
       price: _unitPrice,
-      imageUrl: 'https://shop.upsu.net/cdn/shop/files/The_Union_Print_Shack_Logo_-_smaller_1024x1024@2x.png?v=1760532830',
+      imageUrl:
+          'https://shop.upsu.net/cdn/shop/files/The_Union_Print_Shack_Logo_-_smaller_1024x1024@2x.png?v=1760532830',
       quantity: _quantity,
       size: personalisationText,
       color: '',
@@ -159,16 +161,14 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth > 900;
-          
+
           return SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: isDesktop ? 100 : 20,
                 vertical: 40,
               ),
-              child: isDesktop
-                  ? _buildDesktopLayout()
-                  : _buildMobileLayout(),
+              child: isDesktop ? _buildDesktopLayout() : _buildMobileLayout(),
             ),
           );
         },
@@ -222,7 +222,8 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
               height: 400,
               color: Colors.grey[200],
               child: const Center(
-                child: Icon(Icons.image_not_supported, size: 48, color: Colors.grey),
+                child: Icon(Icons.image_not_supported,
+                    size: 48, color: Colors.grey),
               ),
             );
           },
@@ -230,7 +231,6 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
       ),
     );
   }
-
 
   Widget _buildForm() {
     return Column(
@@ -246,7 +246,7 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Price
         Row(
           children: [
@@ -261,7 +261,7 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
           ],
         ),
         const SizedBox(height: 8),
-        
+
         // Tax included
         const Text(
           'Tax included.',
@@ -344,14 +344,15 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
               borderRadius: BorderRadius.circular(4),
               borderSide: const BorderSide(color: Color(0xFF4d2963), width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             counterText: '${_line1Controller.text.length}/$_maxCharsPerLine',
           ),
           onChanged: (value) {
             setState(() {}); // Update counter
           },
         ),
-        
+
         // Personalisation Line 2 (conditional)
         if (_selectedLines == 'Two Lines of Text') ...[
           const SizedBox(height: 24),
@@ -381,9 +382,11 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
-                borderSide: const BorderSide(color: Color(0xFF4d2963), width: 2),
+                borderSide:
+                    const BorderSide(color: Color(0xFF4d2963), width: 2),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               counterText: '${_line2Controller.text.length}/$_maxCharsPerLine',
             ),
             onChanged: (value) {
@@ -391,7 +394,7 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
             },
           ),
         ],
-        
+
         const SizedBox(height: 24),
 
         // Quantity
@@ -558,7 +561,8 @@ class _PersonalisationPageState extends State<PersonalisationPage> {
     );
   }
 
-  Widget _buildShareButton({required IconData icon, required Color color, required String label}) {
+  Widget _buildShareButton(
+      {required IconData icon, required Color color, required String label}) {
     return Expanded(
       child: OutlinedButton.icon(
         onPressed: () {
