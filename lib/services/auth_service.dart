@@ -28,7 +28,8 @@ class AuthService extends ChangeNotifier {
     if (email.isEmpty || password.isEmpty) {
       _isLoading = false;
       notifyListeners();
-      return AuthResult(success: false, message: 'Email and password are required');
+      return AuthResult(
+          success: false, message: 'Email and password are required');
     }
 
     if (!email.contains('@')) {
@@ -40,7 +41,8 @@ class AuthService extends ChangeNotifier {
     if (password.length < 6) {
       _isLoading = false;
       notifyListeners();
-      return AuthResult(success: false, message: 'Password must be at least 6 characters');
+      return AuthResult(
+          success: false, message: 'Password must be at least 6 characters');
     }
 
     final user = User(
@@ -57,7 +59,8 @@ class AuthService extends ChangeNotifier {
     return AuthResult(success: true, message: 'Signed in successfully');
   }
 
-  Future<AuthResult> signUpWithEmail(String email, String password, String name) async {
+  Future<AuthResult> signUpWithEmail(
+      String email, String password, String name) async {
     _isLoading = true;
     notifyListeners();
 
@@ -78,7 +81,8 @@ class AuthService extends ChangeNotifier {
     if (password.length < 6) {
       _isLoading = false;
       notifyListeners();
-      return AuthResult(success: false, message: 'Password must be at least 6 characters');
+      return AuthResult(
+          success: false, message: 'Password must be at least 6 characters');
     }
 
     final user = User(
