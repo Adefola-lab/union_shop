@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; // ADD THIS
+import 'package:union_shop/services/auth_service.dart';
+import 'package:union_shop/account_page.dart';
+import 'dart:async'; 
 import 'package:union_shop/product_page.dart';
 import 'package:union_shop/about_us.dart';
 import 'package:union_shop/collection.dart';
@@ -9,7 +11,9 @@ import 'package:union_shop/collections_landing.dart';
 import 'package:union_shop/services/cart_service.dart';
 import 'package:union_shop/cart_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService().init();
   runApp(const UnionShopApp());
 }
 
@@ -32,6 +36,7 @@ class UnionShopApp extends StatelessWidget {
         '/sign-in': (context) => const SignInPage(),
         '/cart': (context) => const CartPage(),
         '/search': (context) => const SearchPage(),
+        '/account': (context) => const AccountPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/product') {
@@ -463,8 +468,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   minWidth: 32,
                                   minHeight: 32,
                                 ),
-                                onPressed: () => Navigator.pushNamed(
-                                    context, '/sign-in'), // CHANGE THIS
+                                onPressed: () {
+                                  if(AuthService().isAuthenticated) {
+                                    Navigator.pushNamed(context, '/account');
+                                  } else {
+                                    Navigator.pushNamed(context, '/sign-in');
+                                  }
+                                }
                               ),
                               IconButton(
                                 icon: Stack(
