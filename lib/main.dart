@@ -10,6 +10,8 @@ import 'package:union_shop/sign_in.dart';
 import 'package:union_shop/collections_landing.dart';
 import 'package:union_shop/services/cart_service.dart';
 import 'package:union_shop/cart_page.dart';
+import 'package:union_shop/personalisation_page.dart';
+import 'package:union_shop/print_shack_about.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +39,8 @@ class UnionShopApp extends StatelessWidget {
         '/cart': (context) => const CartPage(),
         '/search': (context) => const SearchPage(),
         '/account': (context) => const AccountPage(),
+        '/personalisation': (context) => const PersonalisationPage(),  // ADD THIS
+        '/print-shack-about': (context) => const PrintShackAboutPage(), // ADD THIS
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/product') {
@@ -382,23 +386,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                   },
                                 ),
                                 const SizedBox(width: 8),
-                                TextButton(
-                                  onPressed: placeholderCallbackForButtons,
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'The Print Shack',
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 14,
+                                PopupMenuButton<String>(
+                                  offset: const Offset(0, 40),
+                                  child: const TextButton(
+                                    onPressed: null,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'The Print Shack',
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 4),
-                                      Icon(Icons.keyboard_arrow_down,
-                                          size: 16, color: Colors.black87),
-                                    ],
+                                        SizedBox(width: 4),
+                                        Icon(Icons.keyboard_arrow_down,
+                                            size: 16, color: Colors.black87),
+                                      ],
+                                    ),
                                   ),
+                                  itemBuilder: (BuildContext context) => [
+                                    const PopupMenuItem<String>(
+                                      value: 'personalisation',
+                                      child: Text('Text Personalisation'),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'about',
+                                      child: Text('About Print Shack'),
+                                    ),
+                                  ],
+                                  onSelected: (String value) {
+                                    if (value == 'personalisation') {
+                                      Navigator.pushNamed(context, '/personalisation');
+                                    } else if (value == 'about') {
+                                      Navigator.pushNamed(context, '/print-shack-about');
+                                    }
+                                  },
                                 ),
                                 const SizedBox(width: 8),
                                 TextButton(
@@ -1053,12 +1077,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         const SizedBox(height: 32),
                                         ElevatedButton(
-                                          onPressed: placeholderCallbackForButtons,
+                                          onPressed: () => Navigator.pushNamed(context, '/personalisation'),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: const Color(0xFF4d2963),
                                             foregroundColor: Colors.white,
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 32,
+                                              horizontal: 24,
                                               vertical: 16,
                                             ),
                                             shape: const RoundedRectangleBorder(
